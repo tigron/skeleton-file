@@ -14,11 +14,29 @@ namespace Skeleton\File;
 class Store {
 
 	/**
+	 * Store_path
+	 *
+	 * @var string $store_path
+	 * @access private
+	 */
+	private $store_path = null;
+
+	/**
 	 * Private constructor
 	 *
 	 * @access private
 	 */
 	private function __construct() {}
+
+	/**
+	 * Set the physical path
+	 *
+	 * @access public
+	 * @param string $path
+	 */
+	public static function set_path($path) {
+		self::$store_path = $path;
+	}
 
 	/**
 	 * Store a file
@@ -30,6 +48,10 @@ class Store {
 	 * @return File $file
 	 */
 	public static function store($name, $content, $created = null) {
+		if (self::$store_path === null) {
+			throw new \Exception('Set a path first by calling "Store::set_path($path)"');
+		}
+
 		$file = new File();
 		$file->name = $name;
 		$file->md5sum = hash('md5', $content);
@@ -71,6 +93,10 @@ class Store {
 	 * @return File $file
 	 */
 	public static function upload($fileinfo) {
+		if (self::$store_path === null) {
+			throw new \Exception('Set a path first by calling "Store::set_path($path)"');
+		}
+
 		$file = new File();
 		$file->name = $fileinfo['name'];
 		$file->md5sum = hash('md5', file_get_contents($fileinfo['tmp_name']));
@@ -115,6 +141,9 @@ class Store {
 	 * @return string $path
 	 */
 	public static function get_path(File $file) {
+		if (self::$store_path === null) {
+			throw new \Exception('Set a path first by calling "Store::set_path($path)"');
+		}
 		$subpath = substr(base_convert($file->md5sum, 16, 10), 0, 3);
 		$subpath = implode('/', str_split($subpath)) . '/';
 
@@ -172,5 +201,4 @@ class Store {
 
 		return $name;
 	}
-
 }
