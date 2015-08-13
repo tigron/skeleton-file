@@ -1,4 +1,4 @@
-# skeleton-database
+# skeleton-file
 
 ## Description
 
