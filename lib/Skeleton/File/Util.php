@@ -8,6 +8,8 @@
  * @author Gerry Demaret <gerry@tigron.be>
  */
 
+namespace Skeleton\File;
+
 class Util {
 
 	/**
