@@ -13,8 +13,6 @@ Installation via composer:
 
     composer require tigron/skeleton-file
 
-## Howto
-
 Create a new table in your database:
 
     CREATE TABLE IF NOT EXISTS `file` (
@@ -27,6 +25,11 @@ Create a new table in your database:
 		PRIMARY KEY (`id`)
     ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
+## Howto
+
+Initialize the file store:
+
+	\Skeleton\File\Store::set_path($some_very_cool_path);
 
 Upload a file:
 
