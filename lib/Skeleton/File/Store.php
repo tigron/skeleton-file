@@ -14,29 +14,11 @@ namespace Skeleton\File;
 class Store {
 
 	/**
-	 * Store_path
-	 *
-	 * @var string $store_path
-	 * @access private
-	 */
-	private $store_path = null;
-
-	/**
 	 * Private constructor
 	 *
 	 * @access private
 	 */
 	private function __construct() {}
-
-	/**
-	 * Set the physical path
-	 *
-	 * @access public
-	 * @param string $path
-	 */
-	public static function set_path($path) {
-		self::$store_path = $path;
-	}
 
 	/**
 	 * Store a file
@@ -48,8 +30,8 @@ class Store {
 	 * @return File $file
 	 */
 	public static function store($name, $content, $created = null) {
-		if (self::$store_path === null) {
-			throw new \Exception('Set a path first by calling "Store::set_path($path)"');
+		if (Config::$store_dir === null) {
+			throw new \Exception('Set a path first in "Config::$store_dir"');
 		}
 
 		$file = new File();
@@ -93,8 +75,8 @@ class Store {
 	 * @return File $file
 	 */
 	public static function upload($fileinfo) {
-		if (self::$store_path === null) {
-			throw new \Exception('Set a path first by calling "Store::set_path($path)"');
+		if (Config::$store_dir === null) {
+			throw new \Exception('Set a path first in "Config::$store_dir"');
 		}
 
 		$file = new File();
@@ -141,13 +123,13 @@ class Store {
 	 * @return string $path
 	 */
 	public static function get_path(File $file) {
-		if (self::$store_path === null) {
-			throw new \Exception('Set a path first by calling "Store::set_path($path)"');
+		if (self::$store_dir === null) {
+			throw new \Exception('Set a path first in "Config::$store_dir"');
 		}
 		$subpath = substr(base_convert($file->md5sum, 16, 10), 0, 3);
 		$subpath = implode('/', str_split($subpath)) . '/';
 
-		$path = STORE_PATH . '/file/' . $subpath . $file->id . '-' . self::sanitize_filename($file->name);
+		$path = Config::$store_dir . '/file/' . $subpath . $file->id . '-' . self::sanitize_filename($file->name);
 
 		return $path;
 	}

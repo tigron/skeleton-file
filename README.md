@@ -29,7 +29,7 @@ Create a new table in your database:
 
 Initialize the file store:
 
-	\Skeleton\File\Store::set_path($some_very_cool_path);
+	\Skeleton\File\Config::$store_dir = $some_very_cool_path;
 
 Upload a file:
 
