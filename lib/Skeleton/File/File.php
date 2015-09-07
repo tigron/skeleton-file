@@ -9,7 +9,10 @@
 namespace Skeleton\File;
 
 class File {
-	use Model, Save, Get;
+	use \Skeleton\Object\Model;
+	use \Skeleton\Object\Save;
+	use \Skeleton\Object\Delete;
+	use \Skeleton\Object\Get;
 
 	/**
 	 * Get information related to this object
@@ -76,7 +79,7 @@ class File {
 	 */
 	public function delete() {
 		Store::delete_file($this);
-		$db = Database::Get();
+		$db = \Skeleton\Database\Database::Get();
 		$db->query('DELETE FROM file WHERE id=?', [$this->id]);
 	}
 
@@ -107,7 +110,7 @@ class File {
 	 * @return array File $items
 	 */
 	public static function get_expired() {
-		$db = Database::Get();
+		$db = \Skeleton\Database\Database::Get();
 		$ids = $db->getCol('SELECT id FROM file WHERE deleted = 0 AND expiration_date IS NOT NULL AND expiration_date < NOW()');
 
 		$items = [];
@@ -193,8 +196,8 @@ class File {
 	 */
 	public static function get_by_id($id) {
 		$file = new File($id);
-		if ($file->is_picture()) {
-			return Picture::get_by_id($id);
+		if ($file->is_picture() and class_exists('\\Skeleton\\File\\Picture\\Picture')) {
+			return \Skeleton\File\Picture\Picture::get_by_id($id);
 		} else {
 			return $file;
 		}

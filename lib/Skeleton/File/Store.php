@@ -93,7 +93,7 @@ class Store {
 
 		// store file on disk
 		if (!move_uploaded_file($fileinfo['tmp_name'], $path)) {
-			throw new Exception('upload failed');
+			throw new \Exception('upload failed');
 		}
 
 		// set mime type and size
@@ -123,7 +123,7 @@ class Store {
 	 * @return string $path
 	 */
 	public static function get_path(File $file) {
-		if (self::$store_dir === null) {
+		if (Config::$store_dir === null) {
 			throw new \Exception('Set a path first in "Config::$store_dir"');
 		}
 		$subpath = substr(base_convert($file->md5sum, 16, 10), 0, 3);
@@ -143,7 +143,7 @@ class Store {
 	 */
 	private static function detect_mime_type($path) {
 		$handle = finfo_open(FILEINFO_MIME);
-		$mime_type = finfo_file($handle,$file);
+		$mime_type = finfo_file($handle, $path);
 
 		if (strpos($mime_type, ';')) {
 			$mime_type = preg_replace('/;.*/', ' ', $mime_type);
