@@ -22,6 +22,7 @@ Create a new table in your database:
 	   `mime_type` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
 	   `size` int(11) NOT NULL,
 	   `created` datetime NOT NULL,
+	   `deleted` datetime NOT NULL,
 		PRIMARY KEY (`id`)
     ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
