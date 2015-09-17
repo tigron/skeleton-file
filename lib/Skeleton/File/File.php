@@ -138,7 +138,7 @@ class File {
 			$threshold = $multiplier * 1000;
 
 			if ($this->size < $threshold) {
-				$this->size = Util::limit_digits($size / $multiplier, false);
+				$size = Util::limit_digits($this->size / $multiplier, false);
 				return $size . ' ' . $unit;
 			}
 		}

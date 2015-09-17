@@ -19,7 +19,7 @@ class Util {
 	 * @param int $number
 	 * @return int $digits
 	 */
-	public function number_of_digits($number) {
+	public static function number_of_digits($number) {
 		$log = log10($number);
 
 		if ($log < 0) {
@@ -41,7 +41,7 @@ class Util {
 	 * @param bool $round
 	 * @param int $digits
 	 */
-	public function limit_digits($value, $round = true, $digits = 3) {
+	public static function limit_digits($value, $round = true, $digits = 3) {
 		$integers = floor($value);
 
 		$decimals_needed = $digits - self::number_of_digits($integers);
