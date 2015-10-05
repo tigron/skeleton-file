@@ -197,9 +197,14 @@ class File {
 	public static function get_by_id($id) {
 		$file = new File($id);
 		if ($file->is_picture() and class_exists('\\Skeleton\\File\\Picture\\Picture')) {
-			return \Skeleton\File\Picture\Picture::get_by_id($id);
+			if (class_exists('\\Picture')) {
+				return \Picture::get_by_id($id);
+			} else {
+				return \Skeleton\File\Picture\Picture::get_by_id($id);
+			}
 		} else {
-			return $file;
+			$classname = get_called_class();
+			return new $classname($id);
 		}
 	}
 }
