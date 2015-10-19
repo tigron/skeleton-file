@@ -34,11 +34,11 @@ Initialize the file store:
 
 Upload a file:
 
-    $file = \Skeleton\File\Store::upload($_FILES['upload']);
+    $file = \Skeleton\File\File::upload($_FILES['upload']);
 
 Create a new file:
 
-    $file = \Skeleton\File\Store::store('filename.txt', 'this is the content');
+    $file = \Skeleton\File\File::store('filename.txt', 'this is the content');
 
 Copy a file:
 
