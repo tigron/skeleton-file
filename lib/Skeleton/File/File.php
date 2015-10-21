@@ -69,7 +69,7 @@ class File {
 	 * @return File $file
 	 */
 	public function copy() {
-		$file = Store::store($this->name, $this->get_contents());
+		$file = self::store($this->name, $this->get_contents());
 		return $file;
 	}
 
@@ -207,7 +207,8 @@ class File {
 	 * @return File $file
 	 */
 	public static function get_by_id($id) {
-		$file = new File($id);
+		$classname = get_called_class();
+		$file = new $classname($id);
 		if ($file->is_picture() and class_exists('\\Skeleton\\File\\Picture\\Picture')) {
 			return \Skeleton\File\Picture\Picture::get_by_id($id);
 		} else {
