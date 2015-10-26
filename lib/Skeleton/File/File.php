@@ -230,8 +230,8 @@ class File {
 	 * @return File $file
 	 */
 	public static function store($name, $content, $created = null) {
-		if (Config::$store_dir === null) {
-			throw new \Exception('Set a path first in "Config::$store_dir"');
+		if (Config::$store_dir === null AND Config::$file_dir === null) {
+			throw new \Exception('Set a path first in "Config::$file_dir"');
 		}
 
 		$file = new self();
@@ -275,8 +275,8 @@ class File {
 	 * @return File $file
 	 */
 	public static function upload($fileinfo) {
-		if (Config::$store_dir === null) {
-			throw new \Exception('Set a path first in "Config::$store_dir"');
+		if (Config::$store_dir === null AND Config::$file_dir === null) {
+			throw new \Exception('Set a path first in "Config::$file_dir"');
 		}
 
 		$file = new self();
