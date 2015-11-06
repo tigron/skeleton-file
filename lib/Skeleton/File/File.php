@@ -28,7 +28,6 @@ class File {
 			'mime_type' => $this->mime_type,
 			'size' => $this->size,
 			'created' => $this->created,
-			'deleted' => $this->deleted,
 			'human_size' => $this->get_human_size(),
 		];
 
@@ -115,7 +114,7 @@ class File {
 	 */
 	public static function get_expired() {
 		$db = \Skeleton\Database\Database::get();
-		$ids = $db->get_column('SELECT id FROM file WHERE deleted = 0 AND expiration_date IS NOT NULL AND expiration_date < NOW()');
+		$ids = $db->get_column('SELECT id FROM file WHERE expiration_date IS NOT NULL AND expiration_date < NOW()');
 
 		$items = [];
 		foreach ($ids as $id) {
