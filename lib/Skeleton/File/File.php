@@ -115,11 +115,11 @@ class File {
 	 */
 	public static function get_expired() {
 		$db = \Skeleton\Database\Database::get();
-		$ids = $db->getCol('SELECT id FROM file WHERE deleted = 0 AND expiration_date IS NOT NULL AND expiration_date < NOW()');
+		$ids = $db->get_column('SELECT id FROM file WHERE deleted = 0 AND expiration_date IS NOT NULL AND expiration_date < NOW()');
 
 		$items = [];
 		foreach ($ids as $id) {
-			$items[] = File::get_by_id($id);
+			$items[] = self::get_by_id($id);
 		}
 
 		return $items;
