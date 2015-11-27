@@ -304,6 +304,42 @@ class File {
 	}
 
 	/**
+	 * Merge files
+	 *
+	 * @access public
+	 * @param string $filename
+	 * @param array $files
+	 * @return File $file
+	 */
+	public static function merge($filename, $files = []) {
+		if (Config::$store_dir === null AND Config::$file_dir === null) {
+			throw new \Exception('Set a path first in "Config::$file_dir"');
+		}
+
+		$command = 'cat ';
+		foreach ($files as $file) {
+			$command .= $file->get_path() . ' ';
+		}
+
+		$command .= ' > ' . \Skeleton\Core\Config::$tmp_dir . $filename;
+		exec($command);
+
+		$merged_file = new self();
+		$merged_file->name = $filename;
+		$merged_file->md5sum = hash('md5', file_get_contents(\Skeleton\Core\Config::$tmp_dir . $filename));
+		$merged_file->save();
+
+		$path = $merged_file->get_path();
+		rename(\Skeleton\Core\Config::$tmp_dir . $filename, $path);
+
+		$merged_file->mime_type = self::detect_mime_type($path);
+		$merged_file->size = filesize($path);
+		$merged_file->save();
+
+		return self::get_by_id($merged_file->id);
+	}
+
+	/**
 	 * Get the mime_type of a file
 	 *
 	 * @access private
