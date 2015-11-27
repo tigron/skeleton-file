@@ -170,9 +170,9 @@ class File {
 		$subpath = implode('/', str_split($subpath)) . '/';
 
 		if (Config::$file_dir !== null) {
-			$path = Config::$file_dir . '/' . $subpath . $this->id . '-' . self::sanitize_filename($this->name);
+			$path = Config::$file_dir . '/' . $subpath . $this->id . '-' . Util::sanitize_filename($this->name);
 		} else {
-			$path = Config::$store_dir . '/file/' . $subpath . $this->id . '-' . self::sanitize_filename($this->name);
+			$path = Config::$store_dir . '/file/' . $subpath . $this->id . '-' . Util::sanitize_filename($this->name);
 		}
 
 		return $path;
@@ -258,7 +258,7 @@ class File {
 		file_put_contents($path, $content);
 
 		// set mime type and size
-		$file->mime_type = self::detect_mime_type($path);
+		$file->mime_type = Util::detect_mime_type($path);
 		$file->size = filesize($path);
 
 		$file->save();
@@ -296,7 +296,7 @@ class File {
 		}
 
 		// set mime type and size
-		$file->mime_type = self::detect_mime_type($path);
+		$file->mime_type = Util::detect_mime_type($path);
 		$file->size = filesize($path);
 		$file->save();
 
@@ -332,60 +332,11 @@ class File {
 		$path = $merged_file->get_path();
 		rename(\Skeleton\Core\Config::$tmp_dir . $filename, $path);
 
-		$merged_file->mime_type = self::detect_mime_type($path);
+		$merged_file->mime_type = Util::detect_mime_type($path);
 		$merged_file->size = filesize($path);
 		$merged_file->save();
 
 		return self::get_by_id($merged_file->id);
 	}
 
-	/**
-	 * Get the mime_type of a file
-	 *
-	 * @access private
-	 * @param string $file The path to the file
-	 * @return string $mime_type
-	 */
-	private static function detect_mime_type($path) {
-		$handle = finfo_open(FILEINFO_MIME);
-		$mime_type = finfo_file($handle, $path);
-
-		if (strpos($mime_type, ';')) {
-			$mime_type = preg_replace('/;.*/', ' ', $mime_type);
-		}
-
-		return trim($mime_type);
-	}
-
-	/**
-	 * Sanitize filenames
-	 *
-	 * @access public
-	 * @param string $name
-	 * @return string $name
-	 */
-	private static function sanitize_filename($name) {
-		$special_chars = ['#','$','%','^','&','*','!','~','‘','"','’','\'','=','?','/','[',']','(',')','|','<','>',';','\\',',','+'];
-		$name = preg_replace('/^[.]*/','',$name); // remove leading dots
-		$name = preg_replace('/[.]*$/','',$name); // remove trailing dots
-		$name = str_replace($special_chars, '', $name);// remove special characters
-		$name = str_replace(' ','_',$name); // replace spaces with _
-
-		$name_array = explode('.', $name);
-
-		if (count($name_array) > 1) {
-			$extension = array_pop($name_array);
-		} else {
-			$extension = null;
-		}
-
-		$name = implode('.', $name_array);
-		$name = substr($name, 0, 50);
-
-		if ($extension != null) {
-			$name = $name . '.' . $extension;
-		}
-
-		return $name;
-	}
 }
