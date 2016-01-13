@@ -321,6 +321,8 @@ class File {
 			$command .= $file->get_path() . ' ';
 		}
 
+		$filename = Util::sanitize_filename($filename);
+
 		$command .= ' > ' . \Skeleton\Core\Config::$tmp_dir . $filename;
 		exec($command);
 
