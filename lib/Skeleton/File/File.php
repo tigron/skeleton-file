@@ -62,13 +62,35 @@ class File {
 	}
 
 	/**
+	 * Is this a pdf
+	 *
+	 * @access public
+	 * @return bool $is_pdf
+	 */
+	public function is_pdf() {
+		$mime_types = [
+			'application/pdf',
+		];
+
+		if (in_array($this->mime_type, $mime_types)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Copy
 	 *
 	 * @access public
+	 * @param string $new_name
 	 * @return File $file
 	 */
-	public function copy() {
-		$file = self::store($this->name, $this->get_contents());
+	public function copy($new_name = null) {
+		if ($new_name === null) {
+			$new_name = $this->name;
+		}
+		$file = self::store($new_name, $this->get_contents());
 		return $file;
 	}
 
@@ -214,6 +236,8 @@ class File {
 		$file = new $classname($id);
 		if ($file->is_picture() and class_exists('\\Skeleton\\File\\Picture\\Picture')) {
 			return \Skeleton\File\Picture\Picture::get_by_id($id);
+		} elseif ($file->is_pdf() and class_exists('\\Skeleton\\File\\Pdf\\Pdf')) {
+			return \Skeleton\File\Pdf\Pdf::get_by_id($id);
 		} else {
 			return $file;
 		}
