@@ -188,8 +188,9 @@ class File {
 		if (Config::$store_dir === null AND Config::$file_dir === null) {
 			throw new \Exception('Set a path first in "Config::$file_dir"');
 		}
-		$subpath = substr(base_convert($this->md5sum, 16, 10), 0, 3);
-		$subpath = implode('/', str_split($subpath)) . '/';
+
+		$parts = str_split($this->md5sum, 2);
+		$subpath = $parts[0] . '/' . $parts[1] . '/' . $parts[2] . '/';
 
 		if (Config::$file_dir !== null) {
 			$path = Config::$file_dir . '/' . $subpath . $this->id . '-' . Util::sanitize_filename($this->name);

@@ -18,10 +18,11 @@ class Migration_20160503_173014_Init extends \Skeleton\Database\Migration {
 	 */
 	public function up() {
 		$db = Database::get();
-		$tables = $db->get_column("SHOW TABLES LIKE 'file'", []);
+		$table = File::trait_get_database_table();
+		$tables = $db->get_column("SHOW TABLES LIKE '" . $table . "'", []);
 		if (count($tables) == 0) {
 			$db->query("
-				CREATE TABLE IF NOT EXISTS `file` (
+				CREATE TABLE IF NOT EXISTS `" . $table . "` (
 				   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 				   `name` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
 				   `unique_name` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
