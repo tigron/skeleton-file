@@ -73,9 +73,10 @@ class Util {
 	 *
 	 * @access public
 	 * @param string $name
+	 * @param string $max_length
 	 * @return string $name
 	 */
-	public static function sanitize_filename($name) {
+	public static function sanitize_filename($name, $max_length = 50) {
 		$special_chars = ['#','$','%','^','&','*','!','~','‘','"','’','\'','=','?','/','[',']','(',')','|','<','>',';','\\',',','+'];
 		$name = preg_replace('/^[.]*/','',$name); // remove leading dots
 		$name = preg_replace('/[.]*$/','',$name); // remove trailing dots
@@ -91,7 +92,9 @@ class Util {
 		}
 
 		$name = implode('.', $name_array);
-		$name = substr($name, 0, 50);
+		if ($max_length != null) {
+			$name = substr($name, 0, $max_length);
+		}
 
 		if ($extension != null) {
 			$name = $name . '.' . $extension;
