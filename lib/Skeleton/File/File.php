@@ -357,6 +357,10 @@ class File {
 		$merged_file->save();
 
 		$path = $merged_file->get_path();
+		$pathinfo = pathinfo($path);
+		if (!is_dir($pathinfo['dirname'])) {
+			mkdir($pathinfo['dirname'], 0755, true);
+		}
 		rename(\Skeleton\Core\Config::$tmp_dir . $filename, $path);
 
 		$merged_file->mime_type = Util::detect_mime_type($path);
