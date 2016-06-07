@@ -236,9 +236,9 @@ class File {
 		$classname = get_called_class();
 		$file = new $classname($id);
 		if ($file->is_picture() and class_exists('\\Skeleton\\File\\Picture\\Picture')) {
-			return \Skeleton\File\Picture\Picture::get_by_id($id);
+			return $classname::get_by_id($id);
 		} elseif ($file->is_pdf() and class_exists('\\Skeleton\\File\\Pdf\\Pdf')) {
-			return \Skeleton\File\Pdf\Pdf::get_by_id($id);
+			return $classname::get_by_id($id);
 		} else {
 			return $file;
 		}
