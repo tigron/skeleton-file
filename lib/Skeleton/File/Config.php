@@ -35,4 +35,11 @@ class Config {
 	 */
 	public static $file_dir = null;
 
+	/**
+	 * File interface class
+	 *
+	 * This class will provide the File functionality, by default a class is defined
+	 */
+	public static $file_interface = '\Skeleton\File\File';
+
 }

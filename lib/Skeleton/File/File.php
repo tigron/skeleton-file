@@ -235,13 +235,20 @@ class File {
 	public static function get_by_id($id) {
 		$classname = get_called_class();
 		$file = new $classname($id);
-		if ($file->is_picture() and class_exists('\\Skeleton\\File\\Picture\\Picture')) {
-			return $classname::get_by_id($id);
-		} elseif ($file->is_pdf() and class_exists('\\Skeleton\\File\\Pdf\\Pdf')) {
-			return $classname::get_by_id($id);
-		} else {
-			return $file;
+
+		if ($file->is_picture()) {
+			$classname = \Skeleton\File\Picture\Config::$picture_interface;
+			if (class_exists($classname)) {
+				$file = new $classname($id);
+			}
+		} elseif ($file->is_pdf()) {
+			$classname = \Skeleton\File\Pdf\Config::$pdf_interface;
+			if (class_exists($classname)) {
+				$file = new $classname($id);
+			}
 		}
+
+		return $file;
 	}
 
 	/**
