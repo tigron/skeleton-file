@@ -236,12 +236,12 @@ class File {
 		$classname = get_called_class();
 		$file = new $classname($id);
 
-		if ($file->is_picture()) {
+		if ($file->is_picture() AND class_exists('\Skeleton\File\Picture\Config')) {
 			$classname = \Skeleton\File\Picture\Config::$picture_interface;
 			if (class_exists($classname)) {
 				$file = new $classname($id);
 			}
-		} elseif ($file->is_pdf()) {
+		} elseif ($file->is_pdf() AND class_exists('\Skeleton\File\Pdf\Config')) {
 			$classname = \Skeleton\File\Pdf\Config::$pdf_interface;
 			if (class_exists($classname)) {
 				$file = new $classname($id);
