@@ -377,4 +377,23 @@ class File {
 		return self::get_by_id($merged_file->id);
 	}
 
+	/**
+	 * Upload multiple
+	 *
+	 * @access public
+	 * @param array $files
+	 */
+	public static function upload_multiple($fileinfo) {
+		$files = [];
+		foreach ($fileinfo['name'] as $key => $value) {
+			$item_fileinfo = array();
+			foreach ($fileinfo as $property => $value) {
+				$item_fileinfo[$property] = $value[$key];
+			}
+			if ($item_fileinfo['size'] > 0) {
+				$files[] = self::upload($item_fileinfo);
+			}
+		}
+		return $files;
+	}
 }
