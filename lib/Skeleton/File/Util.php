@@ -76,31 +76,13 @@ class Util {
 	 * @param string $max_length
 	 * @return string $name
 	 */
-	public static function sanitize_filename($name, $max_length = 50) {
-		$special_chars = ['#','$','%','^','&','*','!','~','‘','"','’','\'','=','?','/','[',']','(',')','|','<','>',';','\\',',','+'];
-		$name = preg_replace('/^[.]*/','',$name); // remove leading dots
-		$name = preg_replace('/[.]*$/','',$name); // remove trailing dots
-		$name = str_replace($special_chars, '', $name);// remove special characters
-		$name = str_replace(' ','_',$name); // replace spaces with _
-
-		$name_array = explode('.', $name);
-
-		if (count($name_array) > 1) {
-			$extension = array_pop($name_array);
-		} else {
-			$extension = null;
-		}
-
-		$name = implode('.', $name_array);
-		if ($max_length != null) {
-			$name = substr($name, 0, $max_length);
-		}
-
-		if ($extension != null) {
-			$name = $name . '.' . $extension;
-		}
-
-		return $name;
+	public static function sanitize_filename($filename, $max_length = 50) {
+		$parts = pathinfo($filename);
+		$slugify = new \Cocur\Slugify\Slugify();
+		$basename = $slugify->slugify($parts['filename']);
+		$extension = $slugify->slugify($parts['extension']);
+		$filename = substr($basename, 0, $max_length-strlen($extension)) . '.' . $extension;
+		return $filename;
 	}
 
 	/**

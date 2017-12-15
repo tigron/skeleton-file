@@ -2,9 +2,10 @@
     "name": "tigron/skeleton-file",
     "description": "Tigron File utilities",
     "type": "library",
-    "require-dev": {
-		"tigron/skeleton-database": "dev-master",
-		"tigron/skeleton-object": "dev-master"
+    "require": {
+    	"cocur/slugify": "1.3",
+		"tigron/skeleton-database": "~0",
+		"tigron/skeleton-object": "~0"
     },
     "license": "MIT",
     "authors": [
