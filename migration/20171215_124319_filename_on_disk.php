@@ -22,7 +22,7 @@ class Migration_20171215_124319_Filename_on_disk extends \Skeleton\Database\Migr
 		$db = Database::get();
 		$db->query("
 			ALTER TABLE `file`
-			ADD `path` varchar(64) COLLATE 'utf8_unicode_ci' NOT NULL AFTER `name`;
+			ADD `path` varchar(128) COLLATE 'utf8_unicode_ci' NOT NULL AFTER `name`;
 		", []);
 
 		$data = $db->get_all('SELECT * FROM file WHERE path = ""', []);
