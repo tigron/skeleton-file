@@ -189,13 +189,20 @@ class File {
 			throw new \Exception('Set a path first in "Config::$file_dir"');
 		}
 
-		$parts = str_split($this->md5sum, 2);
-		$subpath = $parts[0] . '/' . $parts[1] . '/' . $parts[2] . '/';
+		if (isset($this->path) and !empty($this->path)) {
+			$local_path = $this->path;
+		} else {
+			$parts = str_split($this->md5sum, 2);
+			$subpath = $parts[0] . '/' . $parts[1] . '/' . $parts[2] . '/';
+			$local_path = $subpath . $this->id . '-' . Util::sanitize_filename($this->name, 50);
+			$this->path = $local_path;
+			$this->save();
+		}
 
 		if (Config::$file_dir !== null) {
-			$path = Config::$file_dir . '/' . $subpath . $this->id . '-' . Util::sanitize_filename($this->name);
+			$path = Config::$file_dir . '/' . $local_path;
 		} else {
-			$path = Config::$store_dir . '/file/' . $subpath . $this->id . '-' . Util::sanitize_filename($this->name);
+			$path = Config::$store_dir . '/file/' . $local_path;
 		}
 
 		return $path;
@@ -292,7 +299,6 @@ class File {
 		// set mime type and size
 		$file->mime_type = Util::detect_mime_type($path);
 		$file->size = filesize($path);
-
 		$file->save();
 
 		return self::get_by_id($file->id);
@@ -353,7 +359,7 @@ class File {
 			$command .= $file->get_path() . ' ';
 		}
 
-		$filename = Util::sanitize_filename($filename);
+		$filename = Util::sanitize_filename($filename, 50);
 
 		$command .= ' > ' . \Skeleton\Core\Config::$tmp_dir . $filename;
 		exec($command);
