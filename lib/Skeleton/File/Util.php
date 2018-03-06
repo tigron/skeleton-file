@@ -80,8 +80,12 @@ class Util {
 		$parts = pathinfo($filename);
 		$slugify = new \Cocur\Slugify\Slugify();
 		$basename = $slugify->slugify($parts['filename']);
-		$extension = $slugify->slugify($parts['extension']);
-		$filename = substr($basename, 0, $max_length-strlen($extension)) . '.' . $extension;
+		if (isset($parts['extension'])) {
+			$extension = $slugify->slugify($parts['extension']);
+			$filename = substr($basename, 0, $max_length-strlen($extension)) . '.' . $extension;
+		} else {
+			$filename = $basename;
+		}
 		return $filename;
 	}
 
