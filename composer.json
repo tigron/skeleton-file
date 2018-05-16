@@ -7,9 +7,6 @@
 	"tigron/skeleton-database": "0.*",
 	"tigron/skeleton-object": "0.*"
     },
-    "require-dev": {
-	"tigron/skeleton-database": "dev-master"
-    },	
     "license": "MIT",
     "authors": [
         {
