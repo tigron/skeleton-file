@@ -100,12 +100,12 @@ class File {
 	 * @access public
 	 */
 	public function delete() {
+		$db = \Skeleton\Database\Database::get();
+		$db->query('DELETE FROM file WHERE id=?', [$this->id]);
+
 		if (file_exists($this->get_path())) {
 			unlink($this->get_path());
 		}
-
-		$db = \Skeleton\Database\Database::get();
-		$db->query('DELETE FROM file WHERE id=?', [$this->id]);
 	}
 
 	/**

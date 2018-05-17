@@ -25,7 +25,7 @@ class Migration_20171215_124319_Filename_on_disk extends \Skeleton\Database\Migr
 			ADD `path` varchar(128) COLLATE 'utf8_unicode_ci' NOT NULL AFTER `name`;
 		", []);
 
-		$data = $db->get_all('SELECT * FROM file WHERE path = ""', []);
+		$data = $db->get_all('SELECT * FROM file WHERE path = "" AND md5sum != ""', []);
 		foreach ($data as $row) {
 			$path = $this->get_path($row);
 			$db->query('UPDATE file SET path=? WHERE id=?', [ $path, $row['id'] ]);
