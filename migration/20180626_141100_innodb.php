@@ -11,7 +11,7 @@ namespace Skeleton\File;
 
 use \Skeleton\Database\Database;
 
-class Migration_20171215_124319_Filename_on_disk extends \Skeleton\Database\Migration {
+class Migration_20180626_141100_Innodb extends \Skeleton\Database\Migration {
 
 	/**
 	 * Migrate up
@@ -22,7 +22,7 @@ class Migration_20171215_124319_Filename_on_disk extends \Skeleton\Database\Migr
 		$db = Database::get();
 		$result = $db->get_row('show table status where NAME="file"', []);
 
-		if ($result['Engine'] == 'InnoDB') {
+		if ($result['engine'] == 'InnoDB') {
 			return;
 		}
 
