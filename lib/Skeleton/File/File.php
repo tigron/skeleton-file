@@ -316,6 +316,10 @@ class File {
 			throw new \Exception('Set a path first in "Config::$file_dir"');
 		}
 
+		if (empty($fileinfo['tmp_name'])) {
+			throw new \Exception('Upload failed');
+		}
+
 		$file = new self();
 		$file->name = $fileinfo['name'];
 		$file->md5sum = hash('md5', file_get_contents($fileinfo['tmp_name']));
@@ -330,7 +334,7 @@ class File {
 
 		// store file on disk
 		if (!move_uploaded_file($fileinfo['tmp_name'], $path)) {
-			throw new \Exception('upload failed');
+			throw new \Exception('Upload failed');
 		}
 
 		// set mime type and size
