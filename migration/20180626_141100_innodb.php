@@ -22,9 +22,13 @@ class Migration_20180626_141100_Innodb extends \Skeleton\Database\Migration {
 		$db = Database::get();
 		$result = $db->get_row('show table status where NAME="file"', []);
 
-		if ($result['engine'] == 'InnoDB') {
+		if (isset($result['engine']) and $result['engine'] == 'InnoDB') {
 			return;
 		}
+	
+		if (isset($result['Engine']) and $result['Engine'] == 'InnoDB') {
+            		return;
+        	}
 
 		$db->query("
 			ALTER TABLE `file` ENGINE='InnoDB';
