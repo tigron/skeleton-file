@@ -212,11 +212,27 @@ class File {
 	 * Send this file as a download to the client
 	 *
 	 * @access public
+	 * @param int $seconds_to_cache
 	 */
-	public function client_download() {
+	public function client_download($cache = null) {
 		header('Content-type: ' . $this->details['mime_type']);
 		header('Content-Disposition: attachment; filename="'.$this->details['name'].'"');
-		readfile($this->get_path());
+	
+		$filename = $this->get_path();
+		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';		
+		header('Last-Modified: '. $gmt_mtime);				
+		
+		if ($cache !== null) {
+			if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) and$_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime) {
+				header('HTTP/1.1 304 Not Modified');
+				exit;				
+			}
+		
+			header("Cache-Control: public");
+			header('Expires: '.gmdate('D, d M Y H:i:s', strtotime('+' . $cache + ' seconds')).' GMT');			
+		}
+		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';
+		readfile($filename);
 		exit();
 	}
 
@@ -224,11 +240,27 @@ class File {
 	 * Send this file inline to the client
 	 *
 	 * @access public
+	 * @param int $seconds_to_cache
 	 */
-	public function client_inline() {
+	public function client_inline($cache = null) {
 		header('Content-type: ' . $this->details['mime_type']);
 		header('Content-Disposition: inline; filename="'.$this->details['name'].'"');
-		readfile($this->get_path());
+	
+		$filename = $this->get_path();
+		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';		
+		header('Last-Modified: '. $gmt_mtime);				
+		
+		if ($cache !== null) {
+			if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) and$_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime) {
+				header('HTTP/1.1 304 Not Modified');
+				exit;				
+			}
+		
+			header("Cache-Control: public");
+			header('Expires: '.gmdate('D, d M Y H:i:s', strtotime('+' . $cache + ' seconds')).' GMT');			
+		}
+		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';
+		readfile($filename);
 		exit();
 	}
 
