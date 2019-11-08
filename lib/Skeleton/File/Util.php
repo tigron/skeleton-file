@@ -76,13 +76,13 @@ class Util {
 	 * @param string $max_length
 	 * @return string $name
 	 */
-	public static function sanitize_filename($filename, $max_length = 50) {
+	public static function sanitize_filename($filename, $max_length = 128) {
 		$parts = pathinfo($filename);
 		$slugify = new \Cocur\Slugify\Slugify();
 		$basename = $slugify->slugify($parts['filename']);
 		if (isset($parts['extension'])) {
 			$extension = $slugify->slugify($parts['extension']);
-			$filename = substr($basename, 0, $max_length-strlen($extension)) . '.' . $extension;
+			$filename = substr($basename, 0, $max_length - strlen($extension) - 1) . '.' . $extension;
 		} else {
 			$filename = $basename;
 		}

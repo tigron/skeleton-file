@@ -194,7 +194,7 @@ class File {
 		} else {
 			$parts = str_split($this->md5sum, 2);
 			$subpath = $parts[0] . '/' . $parts[1] . '/' . $parts[2] . '/';
-			$local_path = $subpath . $this->id . '-' . Util::sanitize_filename($this->name, 50);
+			$local_path = $subpath . $this->id . '-' . Util::sanitize_filename($this->name, 128);
 			$this->path = $local_path;
 			$this->save();
 		}
@@ -217,19 +217,19 @@ class File {
 	public function client_download($cache = null) {
 		header('Content-type: ' . $this->details['mime_type']);
 		header('Content-Disposition: attachment; filename="'.$this->details['name'].'"');
-	
+
 		$filename = $this->get_path();
-		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';		
-		header('Last-Modified: '. $gmt_mtime);				
-		
+		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';
+		header('Last-Modified: '. $gmt_mtime);
+
 		if ($cache !== null) {
 			if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) and$_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime) {
 				header('HTTP/1.1 304 Not Modified');
-				exit;				
+				exit;
 			}
-		
+
 			header("Cache-Control: public");
-			header('Expires: '.gmdate('D, d M Y H:i:s', strtotime('+' . $cache + ' seconds')).' GMT');			
+			header('Expires: '.gmdate('D, d M Y H:i:s', strtotime('+' . $cache + ' seconds')).' GMT');
 		}
 		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';
 		readfile($filename);
@@ -245,19 +245,19 @@ class File {
 	public function client_inline($cache = null) {
 		header('Content-type: ' . $this->details['mime_type']);
 		header('Content-Disposition: inline; filename="'.$this->details['name'].'"');
-	
+
 		$filename = $this->get_path();
-		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';		
-		header('Last-Modified: '. $gmt_mtime);				
-		
+		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';
+		header('Last-Modified: '. $gmt_mtime);
+
 		if ($cache !== null) {
 			if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) and$_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime) {
 				header('HTTP/1.1 304 Not Modified');
-				exit;				
+				exit;
 			}
-		
+
 			header("Cache-Control: public");
-			header('Expires: '.gmdate('D, d M Y H:i:s', strtotime('+' . $cache + ' seconds')).' GMT');			
+			header('Expires: '.gmdate('D, d M Y H:i:s', strtotime('+' . $cache + ' seconds')).' GMT');
 		}
 		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';
 		readfile($filename);
@@ -303,6 +303,8 @@ class File {
 		if (Config::$store_dir === null AND Config::$file_dir === null) {
 			throw new \Exception('Set a path first in "Config::$file_dir"');
 		}
+
+		$name = Util::sanitize_filename($name);
 
 		$file = new self();
 		$file->name = $name;
@@ -352,6 +354,8 @@ class File {
 			throw new \Exception('Upload failed');
 		}
 
+		$fileinfo['name'] = Util::sanitize_filename($fileinfo['name']);
+
 		$file = new self();
 		$file->name = $fileinfo['name'];
 		$file->md5sum = hash('md5', file_get_contents($fileinfo['tmp_name']));
@@ -395,7 +399,7 @@ class File {
 			$command .= $file->get_path() . ' ';
 		}
 
-		$filename = Util::sanitize_filename($filename, 50);
+		$filename = Util::sanitize_filename($filename);
 
 		$command .= ' > ' . \Skeleton\Core\Config::$tmp_dir . $filename;
 		exec($command);

@@ -15,17 +15,17 @@ Installation via composer:
 
 Create a new table in your database:
 
-    CREATE TABLE IF NOT EXISTS `file` (
-	   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-	   `name` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
-	   `unique_name` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
-	   `md5sum` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
-	   `mime_type` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
-	   `size` bigint NOT NULL,
-	   `created` datetime NOT NULL,
-	   `deleted` datetime NOT NULL,
-		PRIMARY KEY (`id`)
-    ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+    CREATE TABLE `file` (
+        `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+        `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+        `path` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+        `md5sum` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+        `mime_type` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
+        `size` bigint(20) NOT NULL,
+        `expiration_date` datetime DEFAULT NULL,
+        `created` datetime NOT NULL,
+        PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 ## Howto
 
