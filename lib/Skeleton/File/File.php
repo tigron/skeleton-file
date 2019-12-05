@@ -52,6 +52,7 @@ class File {
 			'image/gif',
 			'image/tiff',
 			'image/svg+xml',
+			'image/webp'
 		];
 
 		if (in_array($this->mime_type, $mime_types)) {
