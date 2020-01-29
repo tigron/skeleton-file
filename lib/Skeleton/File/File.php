@@ -81,6 +81,24 @@ class File {
 	}
 
 	/**
+	 * Is this an email
+	 *
+	 * @access public
+	 * @return bool $is_email
+	 */
+	public function is_email() {
+		$mime_types = [
+			'message/rfc822',
+		];
+
+		if (in_array($this->mime_type, $mime_types)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Copy
 	 *
 	 * @access public
@@ -283,6 +301,11 @@ class File {
 			}
 		} elseif ($file->is_pdf() AND class_exists('\Skeleton\File\Pdf\Config')) {
 			$classname = \Skeleton\File\Pdf\Config::$pdf_interface;
+			if (class_exists($classname)) {
+				$file = new $classname($id);
+			}
+		} elseif ($file->is_email() and class_exists('\Skeleton\File\Email\Config')) {
+			$classname = \Skeleton\File\Email\Config::$email_interface;
 			if (class_exists($classname)) {
 				$file = new $classname($id);
 			}
