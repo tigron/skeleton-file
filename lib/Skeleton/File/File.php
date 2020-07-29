@@ -125,6 +125,18 @@ class File {
 		if (file_exists($this->get_path())) {
 			unlink($this->get_path());
 		}
+
+		// resolve the parent paths first, as they won't be resolvable anymore after removal of the first one
+		$parent_paths = [];
+		for ($i = 0; $i <= 2; $i++) {
+			$parent_paths[] = realpath(dirname($this->get_path()) . str_repeat('/..', $i));
+		}
+
+		foreach ($parent_paths as $parent_path) {
+			if (!(new \FilesystemIterator($parent_path))->valid()) {
+				rmdir($parent_path);
+			}
+		}
 	}
 
 	/**
