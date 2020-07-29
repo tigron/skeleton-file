@@ -27,7 +27,9 @@ class Migration_20200729_043210_cleanup_directories extends \Skeleton\Database\M
 		}
 
 		// Loop over all nodes and remove empty directories recursively
-		$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(realpath($store_path), \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
+		$directory_iterator = new \RecursiveDirectoryIterator(realpath($store_path), \FilesystemIterator::SKIP_DOTS);
+		$iterator = new \RecursiveIteratorIterator($directory_iterator, \RecursiveIteratorIterator::CHILD_FIRST);
+		$iterator->setMaxDepth(2);
 
 		foreach ($iterator as $node) {
 			if ($node->isDir() && !(new \FilesystemIterator($node->getPathname()))->valid()) {
