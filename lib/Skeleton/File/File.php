@@ -160,24 +160,6 @@ class File {
 	}
 
 	/**
-	 * Get expired files
-	 *
-	 * @access public
-	 * @return array File $items
-	 */
-	public static function get_expired() {
-		$db = \Skeleton\Database\Database::get();
-		$ids = $db->get_column('SELECT id FROM file WHERE expiration_date IS NOT NULL AND expiration_date < NOW()');
-
-		$items = [];
-		foreach ($ids as $id) {
-			$items[] = self::get_by_id($id);
-		}
-
-		return $items;
-	}
-
-	/**
 	 * Get a human readable version of the size
 	 *
 	 * @access public
@@ -216,11 +198,11 @@ class File {
 	 * @return string $path
 	 */
 	public function get_path() {
-		if (Config::$store_dir === null AND Config::$file_dir === null) {
+		if (Config::$store_dir === null && Config::$file_dir === null) {
 			throw new \Exception('Set a path first in "Config::$file_dir"');
 		}
 
-		if (isset($this->path) and !empty($this->path)) {
+		if (isset($this->path) && !empty($this->path)) {
 			$local_path = $this->path;
 		} else {
 			$parts = str_split($this->md5sum, 2);
@@ -245,26 +227,8 @@ class File {
 	 * @access public
 	 * @param int $seconds_to_cache
 	 */
-	public function client_download($cache = null) {
-		header('Content-type: ' . $this->details['mime_type']);
-		header('Content-Disposition: attachment; filename="'.$this->details['name'].'"');
-
-		$filename = $this->get_path();
-		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';
-		header('Last-Modified: '. $gmt_mtime);
-
-		if ($cache !== null) {
-			if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) and$_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime) {
-				header('HTTP/1.1 304 Not Modified');
-				exit;
-			}
-
-			header("Cache-Control: public");
-			header('Expires: '.gmdate('D, d M Y H:i:s', strtotime('+' . $cache + ' seconds')).' GMT');
-		}
-		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';
-		readfile($filename);
-		exit();
+	public function client_download($seconds_to_cache = null) {
+		$this->send_file('attachment', $seconds_to_cache);
 	}
 
 	/**
@@ -273,26 +237,8 @@ class File {
 	 * @access public
 	 * @param int $seconds_to_cache
 	 */
-	public function client_inline($cache = null) {
-		header('Content-type: ' . $this->details['mime_type']);
-		header('Content-Disposition: inline; filename="'.$this->details['name'].'"');
-
-		$filename = $this->get_path();
-		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';
-		header('Last-Modified: '. $gmt_mtime);
-
-		if ($cache !== null) {
-			if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) and$_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime) {
-				header('HTTP/1.1 304 Not Modified');
-				exit;
-			}
-
-			header("Cache-Control: public");
-			header('Expires: '.gmdate('D, d M Y H:i:s', strtotime('+' . $cache + ' seconds')).' GMT');
-		}
-		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';
-		readfile($filename);
-		exit();
+	public function client_inline($seconds_to_cache = null) {
+		$this->send_file('inline', $seconds_to_cache);
 	}
 
 	/**
@@ -306,17 +252,17 @@ class File {
 		$classname = get_called_class();
 		$file = new $classname($id);
 
-		if ($file->is_picture() AND class_exists('\Skeleton\File\Picture\Config')) {
+		if ($file->is_picture() && class_exists('\Skeleton\File\Picture\Config')) {
 			$classname = \Skeleton\File\Picture\Config::$picture_interface;
 			if (class_exists($classname)) {
 				$file = new $classname($id);
 			}
-		} elseif ($file->is_pdf() AND class_exists('\Skeleton\File\Pdf\Config')) {
+		} elseif ($file->is_pdf() && class_exists('\Skeleton\File\Pdf\Config')) {
 			$classname = \Skeleton\File\Pdf\Config::$pdf_interface;
 			if (class_exists($classname)) {
 				$file = new $classname($id);
 			}
-		} elseif ($file->is_email() and class_exists('\Skeleton\File\Email\Config')) {
+		} elseif ($file->is_email() && class_exists('\Skeleton\File\Email\Config')) {
 			$classname = \Skeleton\File\Email\Config::$email_interface;
 			if (class_exists($classname)) {
 				$file = new $classname($id);
@@ -324,6 +270,24 @@ class File {
 		}
 
 		return $file;
+	}
+
+	/**
+	 * Get expired files
+	 *
+	 * @access public
+	 * @return array File $items
+	 */
+	public static function get_expired() {
+		$db = \Skeleton\Database\Database::get();
+		$ids = $db->get_column('SELECT id FROM file WHERE expiration_date IS NOT NULL AND expiration_date < NOW()');
+
+		$items = [];
+		foreach ($ids as $id) {
+			$items[] = self::get_by_id($id);
+		}
+
+		return $items;
 	}
 
 	/**
@@ -336,42 +300,12 @@ class File {
 	 * @return File $file
 	 */
 	public static function store($name, $content, $created = null) {
-		if (Config::$store_dir === null AND Config::$file_dir === null) {
-			throw new \Exception('Set a path first in "Config::$file_dir"');
-		}
-
-		$name = Util::sanitize_filename($name);
-
-		$file = new self();
-		$file->name = $name;
-		$file->md5sum = hash('md5', $content);
-		$file->save();
-
-		if (is_null($created)) {
-			$created = time();
-		} else {
-			$created = strtotime($created);
-		}
-
-		$file->created = date('Y-m-d H:i:s', $created);
-		$file->save();
-
-		// create directory if not exist
-		$path = $file->get_path();
-		$pathinfo = pathinfo($path);
-		if (!is_dir($pathinfo['dirname'])) {
-			mkdir($pathinfo['dirname'], 0755, true);
-		}
-
-		// store file on disk
-		file_put_contents($path, $content);
-
-		// set mime type and size
-		$file->mime_type = Util::detect_mime_type($path);
-		$file->size = filesize($path);
-		$file->save();
-
-		return self::get_by_id($file->id);
+		return self::create(
+			'store',
+			Util::sanitize_filename($name),
+			$content,
+			$created
+		);
 	}
 
 	/**
@@ -382,81 +316,46 @@ class File {
 	 * @return File $file
 	 */
 	public static function upload($fileinfo) {
-		if (Config::$store_dir === null AND Config::$file_dir === null) {
-			throw new \Exception('Set a path first in "Config::$file_dir"');
-		}
-
 		if (empty($fileinfo['tmp_name'])) {
 			throw new \Exception('Upload failed');
 		}
 
-		$fileinfo['name'] = Util::sanitize_filename($fileinfo['name']);
-
-		$file = new self();
-		$file->name = $fileinfo['name'];
-		$file->md5sum = hash('md5', file_get_contents($fileinfo['tmp_name']));
-		$file->save();
-
-		// create directory if not exist
-		$path = $file->get_path();
-		$pathinfo = pathinfo($path);
-		if (!is_dir($pathinfo['dirname'])) {
-			mkdir($pathinfo['dirname'], 0755, true);
-		}
-
-		// store file on disk
-		if (!move_uploaded_file($fileinfo['tmp_name'], $path)) {
-			throw new \Exception('Upload failed');
-		}
-
-		// set mime type and size
-		$file->mime_type = Util::detect_mime_type($path);
-		$file->size = filesize($path);
-		$file->save();
-
-		return self::get_by_id($file->id);
+		return self::create(
+			'store',
+			Util::sanitize_filename($fileinfo['name']),
+			file_get_contents($fileinfo['tmp_name'])
+		);
 	}
 
 	/**
 	 * Merge files
 	 *
 	 * @access public
-	 * @param string $filename
+	 * @param string $name
 	 * @param array $files
 	 * @return File $file
 	 */
-	public static function merge($filename, $files = []) {
-		if (Config::$store_dir === null AND Config::$file_dir === null) {
+	public static function merge($name, $files = []) {
+		if (Config::$store_dir === null && Config::$file_dir === null) {
 			throw new \Exception('Set a path first in "Config::$file_dir"');
 		}
 
+		// Sanitize name
+		$name = Util::sanitize_filename($name);
+
+		// Merge files
 		$command = 'cat ';
 		foreach ($files as $file) {
 			$command .= $file->get_path() . ' ';
 		}
-
-		$filename = Util::sanitize_filename($filename);
-
-		$command .= ' > ' . \Skeleton\Core\Config::$tmp_dir . $filename;
+		$command .= ' > ' . \Skeleton\Core\Config::$tmp_dir . $name;
 		exec($command);
 
-		$merged_file = new self();
-		$merged_file->name = $filename;
-		$merged_file->md5sum = hash('md5', file_get_contents(\Skeleton\Core\Config::$tmp_dir . $filename));
-		$merged_file->save();
-
-		$path = $merged_file->get_path();
-		$pathinfo = pathinfo($path);
-		if (!is_dir($pathinfo['dirname'])) {
-			mkdir($pathinfo['dirname'], 0755, true);
-		}
-		rename(\Skeleton\Core\Config::$tmp_dir . $filename, $path);
-
-		$merged_file->mime_type = Util::detect_mime_type($path);
-		$merged_file->size = filesize($path);
-		$merged_file->save();
-
-		return self::get_by_id($merged_file->id);
+		return self::create(
+			'merge',
+			$name,
+			file_get_contents(\Skeleton\Core\Config::$tmp_dir . $name)
+		);
 	}
 
 	/**
@@ -468,14 +367,99 @@ class File {
 	public static function upload_multiple($fileinfo) {
 		$files = [];
 		foreach ($fileinfo['name'] as $key => $value) {
-			$item_fileinfo = array();
+			$item_fileinfo = [];
 			foreach ($fileinfo as $property => $value) {
 				$item_fileinfo[$property] = $value[$key];
 			}
+
 			if ($item_fileinfo['size'] > 0) {
 				$files[] = self::upload($item_fileinfo);
 			}
 		}
+
 		return $files;
+	}
+
+	/**
+	 * Send this file
+	 *
+	 * @access public
+	 * @param string $content_disposition
+	 * @param int $seconds_to_cache
+	 */
+	private function send_file($content_disposition, $seconds_to_cache = null) {
+		header('Content-type: ' . $this->mime_type);
+		header('Content-Disposition: ' . $content_disposition . '; filename="' . $this->name . '"');
+
+		$filename = $this->get_path();
+		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';
+		header('Last-Modified: ' . $gmt_mtime);
+
+		if (!empty($seconds_to_cache)) {
+			if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $gmt_mtime) {
+				header('HTTP/1.1 304 Not Modified');
+				return;
+			}
+
+			header('Cache-Control: public');
+			header('Expires: ' . gmdate('D, d M Y H:i:s', strtotime('+' . $seconds_to_cache + ' seconds')) . ' GMT');
+		}
+
+		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';
+		readfile($filename);
+	}
+
+	/**
+	 * Create File
+	 * Store file on disk
+	 *
+	 * @access private
+	 * @param string $action
+	 * @param string $name
+	 * @param string $content
+	 * @param string $created
+	 * @return File
+	 */
+	private static function create($action, $name, $content, $created = null) {
+		if (Config::$store_dir === null && Config::$file_dir === null) {
+			throw new \Exception('Set a path first in "Config::$file_dir"');
+		}
+
+		if (empty($created)) {
+			$created = time();
+		} else {
+			$created = strtotime($created);
+		}
+
+		$file = new self();
+		$file->name = $name;
+		$file->md5sum = hash('md5', $content);
+		$file->created = date('YmdHis', $created);
+		$file->save();
+
+		// create directory if not exist
+		$path = $file->get_path();
+		$pathinfo = pathinfo($path);
+		if (!is_dir($pathinfo['dirname'])) {
+			mkdir($pathinfo['dirname'], 0755, true);
+		}
+
+		// store file on disk
+		if ($action == 'upload') {
+			if (!move_uploaded_file($fileinfo['tmp_name'], $path)) {
+				throw new \Exception('Upload failed');
+			}
+		} elseif ($action == 'merge') {
+			rename(\Skeleton\Core\Config::$tmp_dir . $name, $path);
+		} else {
+			file_put_contents($path, $content);
+		}
+
+		// set mime type and size
+		$file->mime_type = Util::detect_mime_type($path);
+		$file->size = filesize($path);
+		$file->save();
+
+		return self::get_by_id($file->id);
 	}
 }
