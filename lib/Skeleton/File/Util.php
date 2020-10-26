@@ -78,8 +78,8 @@ class Util {
 	 */
 	public static function sanitize_filename($filename, $max_length = 128) {
 		$parts = pathinfo($filename);
-		$slugify = new \Cocur\Slugify\Slugify();
-		$basename = $slugify->slugify($parts['filename']);
+		$slugify = new \Cocur\Slugify\Slugify(null, [ 'lowercase' => false ]);
+		$basename = $slugify->slugify($parts['filename'], '_');
 		if (isset($parts['extension'])) {
 			$extension = $slugify->slugify($parts['extension']);
 			$filename = substr($basename, 0, $max_length - strlen($extension) - 1) . '.' . $extension;
