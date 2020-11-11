@@ -402,7 +402,7 @@ class File {
 			}
 
 			header('Cache-Control: public');
-			header('Expires: ' . gmdate('D, d M Y H:i:s', strtotime('+' . $seconds_to_cache + ' seconds')) . ' GMT');
+			header('Expires: ' . gmdate('D, d M Y H:i:s', strtotime('+' . $seconds_to_cache . ' seconds')) . ' GMT');
 		}
 
 		$gmt_mtime = gmdate('D, d M Y H:i:s', filemtime($filename)).' GMT';
