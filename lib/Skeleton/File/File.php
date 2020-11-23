@@ -267,6 +267,11 @@ class File {
 			if (class_exists($classname)) {
 				$file = new $classname($id);
 			}
+		} elseif (\Skeleton\File\Config::$file_interface != '\Skeleton\File\File') {
+			$classname = \Skeleton\File\Config::$file_interface;
+			if (class_exists($classname)) {
+				$file = new $classname($id);
+			}
 		}
 
 		return $file;
