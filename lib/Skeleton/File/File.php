@@ -307,7 +307,7 @@ class File {
 	public static function store($name, $content, $created = null) {
 		return self::create(
 			'store',
-			Util::sanitize_filename($name),
+			Util::beautify_string($name),
 			$content,
 			$created
 		);
@@ -327,7 +327,7 @@ class File {
 
 		return self::create(
 			'store',
-			Util::sanitize_filename($fileinfo['name']),
+			Util::beautify_string($fileinfo['name']),
 			file_get_contents($fileinfo['tmp_name'])
 		);
 	}
@@ -345,21 +345,21 @@ class File {
 			throw new \Exception('Set a path first in "Config::$file_dir"');
 		}
 
-		// Sanitize name
-		$name = Util::sanitize_filename($name);
+		// Sanitize name to use as a filename
+		$filename = Util::sanitize_filename($name);
 
 		// Merge files
 		$command = 'cat ';
 		foreach ($files as $file) {
 			$command .= $file->get_path() . ' ';
 		}
-		$command .= ' > ' . \Skeleton\Core\Config::$tmp_dir . $name;
+		$command .= ' > ' . \Skeleton\Core\Config::$tmp_dir . $filename;
 		exec($command);
 
 		return self::create(
 			'merge',
-			$name,
-			file_get_contents(\Skeleton\Core\Config::$tmp_dir . $name)
+			Util::beautify_string($name),
+			file_get_contents(\Skeleton\Core\Config::$tmp_dir . $filename)
 		);
 	}
 
