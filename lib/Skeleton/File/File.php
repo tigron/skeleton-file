@@ -14,6 +14,7 @@ class File {
 	use \Skeleton\Object\Save;
 	use \Skeleton\Object\Delete;
 	use \Skeleton\Object\Get;
+	use \Skeleton\Object\Uuid;
 
 	/**
 	 * Get information related to this object
