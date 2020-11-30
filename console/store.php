@@ -41,16 +41,12 @@ class File_Store extends \Skeleton\Console\Command {
 			$output->writeln('<error>Please specify an existing filename</error>');
 			return 1;
 		}
-		if (file_exists($filename) == false) {
-			$output->writeln('<error>Please specify an existing filename</error>');
-			return 1;
-		}
 		if (is_dir($filename)) {
 			$output->writeln('<error>Argument specified appears to be a directory, not allowed</error>');
 			return 1;
 		}
 		try {
-			$file = \File::store(basename($filename), file_get_contents($filename));
+			$file = \Skeleton\File\File::store(basename($filename), file_get_contents($filename));
 		} catch (Exception $e) {
 			$output->writeln('<error>' . $e->getMessage . ' - file not stored</error>');
 			return 1;
@@ -74,7 +70,7 @@ class File_Store extends \Skeleton\Console\Command {
 			do {
 				$ids = $db->get_column("SELECT id FROM file WHERE uuid IS NULL ORDER BY id LIMIT 100");
 				foreach ($ids as $id) {
-					$file = \File::get_by_id($id);
+					$file = \Skeleton\File\File::get_by_id($id);
 					$file->save();
 				}
 			} while (count($ids) > 0);

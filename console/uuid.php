@@ -60,7 +60,7 @@ class File_Uuid extends \Skeleton\Console\Command {
 			do {
 				$ids = $db->get_column("SELECT id FROM file WHERE uuid IS NULL ORDER BY id LIMIT 100");
 				foreach ($ids as $id) {
-					$file = \File::get_by_id($id);
+					$file = \Skeleton\File\File::get_by_id($id);
 					$file->save();
 				}
 			} while (count($ids) > 0);

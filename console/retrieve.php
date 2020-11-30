@@ -41,7 +41,7 @@ class File_Retrieve extends \Skeleton\Console\Command {
 		$dir = $input->getArgument('dir');
 
 		try {
-			$file = \File::get_by_id($id);
+			$file = \Skeleton\File\File::get_by_id($id);
 			if ($dir != '') {
 				if (file_exists($dir) == false) {
 					$output->writeln('<error>Directory ' . $dir . ' not found</error>');
