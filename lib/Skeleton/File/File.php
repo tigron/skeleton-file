@@ -251,6 +251,14 @@ class File {
 	 */
 	public static function get_by_id($id) {
 		$classname = get_called_class();
+		if ($classname::trait_cache_enabled()) {
+			$prefix = $classname::trait_get_cache_prefix();
+			try {
+				$object = get_called_class()::cache_get($prefix . '_' . $id);
+				return $object;
+			} catch (\Exception $e) { }
+		}
+
 		$file = new $classname($id);
 
 		if ($file->is_picture() && class_exists('\Skeleton\File\Picture\Config')) {
@@ -273,6 +281,11 @@ class File {
 			if (class_exists($classname)) {
 				$file = new $classname($id);
 			}
+		}
+
+		if ($classname::trait_cache_enabled()) {
+			$prefix = $classname::trait_get_cache_prefix();
+			$classname::cache_set($prefix . '_' . $file->id, $file);
 		}
 
 		return $file;
@@ -437,7 +450,8 @@ class File {
 			$created = strtotime($created);
 		}
 
-		$file = new self();
+		$file_classname = get_called_class();
+		$file = new $file_classname();
 		$file->name = $name;
 		$file->md5sum = hash('md5', $content);
 		$file->created = date('YmdHis', $created);
@@ -466,6 +480,6 @@ class File {
 		$file->size = filesize($path);
 		$file->save();
 
-		return self::get_by_id($file->id);
+		return $file_classname::get_by_id($file->id);
 	}
 }
