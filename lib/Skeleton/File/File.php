@@ -250,16 +250,7 @@ class File {
 	 * @return File $file
 	 */
 	public static function get_by_id($id) {
-		$classname = get_called_class();
-		if ($classname::trait_cache_enabled()) {
-			$prefix = $classname::trait_get_cache_prefix();
-			try {
-				$object = get_called_class()::cache_get($prefix . '_' . $id);
-				return $object;
-			} catch (\Exception $e) { }
-		}
-
-		$file = new $classname($id);
+		$file = new self($id);
 
 		if ($file->is_picture() && class_exists('\Skeleton\File\Picture\Config')) {
 			$classname = \Skeleton\File\Picture\Config::$picture_interface;
@@ -281,11 +272,6 @@ class File {
 			if (class_exists($classname)) {
 				$file = new $classname($id);
 			}
-		}
-
-		if ($classname::trait_cache_enabled()) {
-			$prefix = $classname::trait_get_cache_prefix();
-			$classname::cache_set($prefix . '_' . $file->id, $file);
 		}
 
 		return $file;
