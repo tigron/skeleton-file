@@ -255,32 +255,32 @@ class File {
 			$prefix = $classname::trait_get_cache_prefix();
 			try {
 				$object = get_called_class()::cache_get($prefix . '_' . $id);
-				return $object;
 			} catch (\Exception $e) { }
 		}
 
-		$file = new $classname($id);
+		if (empty($object)) {
+			$object = new $classname($id);
+		}
 
-		if ($file->is_picture() && class_exists('\Skeleton\File\Picture\Config')) {
+		if ($object->is_picture() && class_exists('\Skeleton\File\Picture\Config')) {
 			$classname = \Skeleton\File\Picture\Config::$picture_interface;
-			if (class_exists($classname)) {
-				$file = new $classname($id);
-			}
-		} elseif ($file->is_pdf() && class_exists('\Skeleton\File\Pdf\Config')) {
+		} elseif ($object->is_pdf() && class_exists('\Skeleton\File\Pdf\Config')) {
 			$classname = \Skeleton\File\Pdf\Config::$pdf_interface;
-			if (class_exists($classname)) {
-				$file = new $classname($id);
-			}
-		} elseif ($file->is_email() && class_exists('\Skeleton\File\Email\Config')) {
+		} elseif ($object->is_email() && class_exists('\Skeleton\File\Email\Config')) {
 			$classname = \Skeleton\File\Email\Config::$email_interface;
-			if (class_exists($classname)) {
-				$file = new $classname($id);
-			}
 		} elseif (\Skeleton\File\Config::$file_interface != '\Skeleton\File\File') {
 			$classname = \Skeleton\File\Config::$file_interface;
-			if (class_exists($classname)) {
-				$file = new $classname($id);
-			}
+		}
+
+		$path = explode('\\', $classname);
+		$classname_without_namespace = array_pop($path);
+
+		if ($object->get_classname() == $classname_without_namespace) {
+			return $object;
+		}
+
+		if (class_exists($classname)) {
+			$file = new $classname($id);
 		}
 
 		if ($classname::trait_cache_enabled()) {
