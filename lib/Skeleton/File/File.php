@@ -436,8 +436,7 @@ class File {
 			$created = strtotime($created);
 		}
 
-		$file_classname = get_called_class();
-		$file = new $file_classname();
+		$file = new self();
 		$file->name = $name;
 		$file->md5sum = hash('md5', $content);
 		$file->created = date('YmdHis', $created);
@@ -466,6 +465,7 @@ class File {
 		$file->size = filesize($path);
 		$file->save();
 
+		$file_classname = get_called_class();
 		return $file_classname::get_by_id($file->id);
 	}
 }
