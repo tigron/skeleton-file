@@ -25,6 +25,7 @@ class File {
 	public function get_info($exclude_content = false) {
 		$info = [
 			'id' => $this->id,
+			'uuid' => $this->uuid,
 			'name' => $this->name,
 			'mime_type' => $this->mime_type,
 			'size' => $this->size,
