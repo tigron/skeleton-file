@@ -25,6 +25,7 @@ class File_Cleanup extends \Skeleton\Console\Command {
 		$this->setName('file:cleanup');
 		$this->setDescription('Clean up the file store');
 		$this->addArgument('type', InputArgument::REQUIRED, 'What to clean up, accepts "leaves"');
+		$this->addArgument('mode', InputArgument::OPTIONAL, 'How to clean up, accepts "dryrun" or nothing for real execution');
 	}
 
 	/**
@@ -36,23 +37,29 @@ class File_Cleanup extends \Skeleton\Console\Command {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$type = $input->getArgument('type');
+		$dryrun = $input->getArgument('mode');
+		if (strtoupper($dryrun) == 'DRYRUN' || strtoupper($dryrun) == 'DRY-RUN') {
+			$dryrun = true;
+		} else {
+			$dryrun = false;
+		}
+
+		if (\Skeleton\File\Config::$file_dir !== null) {
+			$store_path = \Skeleton\File\Config::$file_dir . '/';
+		} else {
+			$store_path = \Skeleton\File\Config::$store_dir . '/file/';
+		}
+
+		$store_path = realpath($store_path);
+
+		if ($store_path === false) {
+			$output->writeln('<error>skeleton-file is not properly configured, resolved store path is incorrect</error>');
+			return 1;
+		}
 
 		if ($type === 'leaves') {
 			if (\Skeleton\File\Config::$store_dir === null && \Skeleton\File\Config::$file_dir === null) {
 				$output->writeln('<error>skeleton-file is not properly configured, store_dir and file_dir missing</error>');
-				return 1;
-			}
-
-			if (\Skeleton\File\Config::$file_dir !== null) {
-				$store_path = \Skeleton\File\Config::$file_dir . '/';
-			} else {
-				$store_path = \Skeleton\File\Config::$store_dir . '/file/';
-			}
-
-			$store_path = realpath($store_path);
-
-			if ($store_path === false) {
-				$output->writeln('<error>skeleton-file is not properly configured, resolved store path is incorrect</error>');
 				return 1;
 			}
 
@@ -63,9 +70,37 @@ class File_Cleanup extends \Skeleton\Console\Command {
 
 			foreach ($iterator as $node) {
 				if ($node->isDir() && !(new \FilesystemIterator($node->getPathname()))->valid()) {
-					rmdir((string)$node);
+					if ($dryrun) {
+						if (count(scandir($node)) == 0) {
+							printf("%s\n", (string)$node);
+						}
+					} else {
+						rmdir((string)$node);
+					}
 				}
 			}
+		} else if ($type == 'orphans') {
+			$db = \Skeleton\Database\Database::Get();
+			$offset = 0;
+			do {
+				$rows = $db->get_all("SELECT id, path FROM file LIMIT 100 OFFSET " . $offset);
+				foreach ($rows as $row) {
+					if (file_exists(realpath($store_path . '/' . $row['path'])) == false) {
+						if ($dryrun) {
+							printf("File #%d (%s) not found\n", $row['id'], $row['path']);
+						} else {
+							printf("File #%d (%s) not found; deleting\n", $row['id'], $row['path']);
+							try {
+								$db->query("DELETE FROM file WHERE id = ?", [ $row['id'] ]);
+								$db->query("DELETE FROM picture WHERE file_id = ?", [ $row['id'] ]);
+							} catch (\Exception $e) {
+								printf("  %s\n", $e->getMessage());
+							}
+						}
+					}
+				}
+				$offset += 100;
+			} while(count($rows) == 100);
 		} else {
 			$output->writeln('<error>Unsupported cleanup type</error>');
 			return 1;
