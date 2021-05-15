@@ -139,10 +139,8 @@ class File {
 				if (!(new \FilesystemIterator($parent_path))->valid()) {
 					rmdir($parent_path);
 				}
-			} catch (Exception $e) {
-				print_r($parent_paths);
-				printf("[%s]", $parent_path);
-				throw $e;
+			} catch (\Exception $e) {
+				throw new \Exception($e->getMessage . ' (' . $this->id . ') [' . $parent_paths . '] {' . $parent_path . '}');
 			}
 		}
 	}
