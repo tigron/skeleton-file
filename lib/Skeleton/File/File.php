@@ -135,8 +135,14 @@ class File {
 		}
 
 		foreach ($parent_paths as $parent_path) {
-			if (!(new \FilesystemIterator($parent_path))->valid()) {
-				rmdir($parent_path);
+			try {
+				if (!(new \FilesystemIterator($parent_path))->valid()) {
+					rmdir($parent_path);
+				}
+			} catch (Exception $e) {
+				print_r($parent_paths);
+				printf("[%s]", $parent_path);
+				throw $e;
 			}
 		}
 	}
