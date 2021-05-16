@@ -140,7 +140,7 @@ class File {
 					rmdir($parent_path);
 				}
 			} catch (\Exception $e) {
-				throw new \Exception($e->getMessage . ' (' . $this->id . ') [' . $parent_paths . '] {' . $parent_path . '}');
+				throw new \Exception($e->getMessage() . ' (' . $this->id . ') [' . $parent_paths . '] {' . $parent_path . '}');
 			}
 		}
 	}
