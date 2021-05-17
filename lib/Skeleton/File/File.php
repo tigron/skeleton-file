@@ -135,12 +135,8 @@ class File {
 		}
 
 		foreach ($parent_paths as $parent_path) {
-			try {
-				if (!(new \FilesystemIterator($parent_path))->valid()) {
-					rmdir($parent_path);
-				}
-			} catch (\Exception $e) {
-				throw new \Exception($e->getMessage() . ' (' . $this->id . ') [' . $parent_paths . '] {' . $parent_path . '}');
+			if (!(new \FilesystemIterator($parent_path))->valid()) {
+				rmdir($parent_path);
 			}
 		}
 	}
