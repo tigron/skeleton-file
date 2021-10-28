@@ -29,6 +29,7 @@ class Migration_20160503_173014_Init extends \Skeleton\Database\Migration {
 				   `md5sum` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
 				   `mime_type` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
 				   `size` int(11) NOT NULL,
+				   `expiration_date` datetime DEFAULT NULL,
 				   `created` datetime NOT NULL,
 				   `deleted` datetime NOT NULL,
 					PRIMARY KEY (`id`)
