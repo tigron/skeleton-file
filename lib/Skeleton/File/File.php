@@ -346,6 +346,8 @@ class File {
 			throw new \Exception('Set a path first in "Config::$file_dir"');
 		}
 
+		$config = \Skeleton\Core\Config::Get();
+
 		// Sanitize name to use as a filename
 		$filename = Util::sanitize_filename($name);
 
@@ -354,13 +356,13 @@ class File {
 		foreach ($files as $file) {
 			$command .= $file->get_path() . ' ';
 		}
-		$command .= ' > ' . \Skeleton\Core\Config::$tmp_dir . $filename;
+		$command .= ' > ' . $config->tmp_dir . $filename;
 		exec($command);
 
 		return self::create(
 			'merge',
 			Util::beautify_string($name),
-			file_get_contents(\Skeleton\Core\Config::$tmp_dir . $filename)
+			file_get_contents($config->tmp_dir . $filename)
 		);
 	}
 
@@ -456,7 +458,7 @@ class File {
 				throw new \Exception('Upload failed');
 			}
 		} elseif ($action == 'merge') {
-			rename(\Skeleton\Core\Config::$tmp_dir . $name, $path);
+			rename(\Skeleton\Core\Config::Get()->tmp_dir . $name, $path);
 		} else {
 			file_put_contents($path, $content);
 		}

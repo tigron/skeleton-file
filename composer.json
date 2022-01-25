@@ -6,7 +6,8 @@
 		"php": ">=7.0.0",
 		"ext-intl": "*",
 		"tigron/skeleton-database": "0.*",
-		"tigron/skeleton-object": "0.* || 1.*"
+		"tigron/skeleton-object": "0.* || 1.*",
+		"tigron/skeleton-core": "2.*"
 	},
 	"license": "MIT",
 	"authors": [
