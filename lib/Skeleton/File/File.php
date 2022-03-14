@@ -361,7 +361,7 @@ class File {
 
 		return self::create(
 			'merge',
-			Util::beautify_string($name),
+			Util::sanitize_filename($name),
 			file_get_contents($config->tmp_dir . $filename)
 		);
 	}
