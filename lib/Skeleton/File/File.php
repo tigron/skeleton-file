@@ -204,7 +204,7 @@ class File {
 			Config::$file_path = Config::$file_dir;
 		} elseif (Config::$store_dir !== null) {
 			Config::$file_path = Config::$store_dir . '/file';
-		} else {
+		} elseif (Config::$file_path === null) {
 			throw new \Exception('Set a path first in "Config::$file_path"');
 		}
 
@@ -341,6 +341,11 @@ class File {
 	 */
 	public static function merge($name, $files = []) {
 		$config = \Skeleton\Core\Config::Get();
+		if (empty($config->tmp_dir) === false) {
+			$config->tmp_path = $config->tmp_dir;
+		} elseif (empty($config->tmp_path) === true) {
+			throw new \Exception('No tmp path defined');
+		}
 
 		// Sanitize name to use as a filename
 		$filename = Util::sanitize_filename($name);
@@ -350,13 +355,13 @@ class File {
 		foreach ($files as $file) {
 			$command .= $file->get_path() . ' ';
 		}
-		$command .= ' > ' . $config->tmp_dir . $filename;
+		$command .= ' > ' . $config->tmp_path . $filename;
 		exec($command);
 
 		return self::create(
 			'merge',
 			Util::sanitize_filename($name),
-			file_get_contents($config->tmp_dir . $filename)
+			file_get_contents($config->tmp_path . $filename)
 		);
 	}
 
@@ -448,7 +453,14 @@ class File {
 				throw new \Exception('Upload failed');
 			}
 		} elseif ($action == 'merge') {
-			rename(\Skeleton\Core\Config::Get()->tmp_dir . $name, $path);
+			$config = \Skeleton\Core\Config::get();
+			if (empty($config->tmp_dir) === false) {
+				$config->tmp_path = $config->tmp_dir;
+			} elseif (empty($config->tmp_path) === true) {
+				throw new \Exception('No tmp path defined');
+			}
+
+			rename($config->tmp_path . $name, $path);
 		} else {
 			file_put_contents($path, $content);
 		}

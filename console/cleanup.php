@@ -45,12 +45,15 @@ class File_Cleanup extends \Skeleton\Console\Command {
 		}
 
 		if (\Skeleton\File\Config::$file_dir !== null) {
-			$store_path = \Skeleton\File\Config::$file_dir . '/';
-		} else {
-			$store_path = \Skeleton\File\Config::$store_dir . '/file/';
+			\Skeleton\File\Config::$file_path = \Skeleton\File\Config::$file_dir;
+		} elseif (\Skeleton\File\Config::$store_dir !== null) {
+			\Skeleton\File\Config::$file_path = \Skeleton\File\Config::$file_dir . '/file';
+		} elseif (Config::$file_path === null) {
+			$output->writeln('<error>skeleton-file is not properly configured, store_dir and file_dir missing</error>');
+			return 1;
 		}
 
-		$store_path = realpath($store_path);
+		$store_path = realpath(\Skeleton\File\Config::$file_path . '/');
 
 		if ($store_path === false) {
 			$output->writeln('<error>skeleton-file is not properly configured, resolved store path is incorrect</error>');
@@ -58,11 +61,6 @@ class File_Cleanup extends \Skeleton\Console\Command {
 		}
 
 		if ($type === 'leaves') {
-			if (\Skeleton\File\Config::$store_dir === null && \Skeleton\File\Config::$file_dir === null) {
-				$output->writeln('<error>skeleton-file is not properly configured, store_dir and file_dir missing</error>');
-				return 1;
-			}
-
 			// Loop over all nodes and remove empty directories recursively
 			$directory_iterator = new \RecursiveDirectoryIterator(realpath($store_path), \FilesystemIterator::SKIP_DOTS);
 			$iterator = new \RecursiveIteratorIterator($directory_iterator, \RecursiveIteratorIterator::CHILD_FIRST);
