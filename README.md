@@ -39,7 +39,7 @@ Initialize the file store:
 	 *
 	 * \Skeleton\File\Config::$file_dir is deprecated
 	 *
-	 * Please use $file_dir instead
+	 * Please use $file_path instead
 	 */
 
 Upload a file:
