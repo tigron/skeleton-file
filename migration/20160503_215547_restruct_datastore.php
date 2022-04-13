@@ -53,19 +53,18 @@ class Migration_20160503_215547_Restruct_datastore extends \Skeleton\Database\Mi
 	 * @return string $path
 	 */
 	private function get_old_path(File $file) {
-		if (Config::$store_dir === null AND Config::$file_dir === null) {
-			throw new \Exception('Set a path first in "Config::$file_dir"');
+		if (Config::$file_dir !== null) {
+			Config::$file_path = Config::$file_dir;
+		} elseif (Config::$store_dir !== null) {
+			Config::$file_path = Config::$store_dir . '/file';
+		} else {
+			throw new \Exception('Set a path first in "Config::$file_path"');
 		}
+
 		$subpath = substr(base_convert($file->md5sum, 16, 10), 0, 3);
 		$subpath = implode('/', str_split($subpath)) . '/';
 
-		if (\Skeleton\File\Config::$file_dir !== null) {
-			$path = \Skeleton\File\Config::$file_dir . '/' . $subpath . $file->id . '-' . \Skeleton\File\Util::sanitize_filename($file->name);
-		} else {
-			$path = \Skeleton\File\Config::$store_dir . '/file/' . $subpath . $file->id . '-' . \Skeleton\File\Util::sanitize_filename($file->name);
-		}
-
-		return $path;
+		return \Skeleton\File\Config::$file_path . '/' . $subpath . $file->id . '-' . \Skeleton\File\Util::sanitize_filename($file->name);
 	}
 
 	/**

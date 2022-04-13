@@ -39,6 +39,3 @@ class Migration_20200520_162100_update_default_value_for_deleted extends \Skelet
 
 	}
 }
-
-
-

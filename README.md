@@ -31,11 +31,14 @@ Create a new table in your database:
 
 Initialize the file store:
 
-	\Skeleton\File\Config::$file_dir = $some_very_cool_path;
+	\Skeleton\File\Config::$file_path = $some_very_cool_path;
 
 	/**
 	 * \Skeleton\File\Config::$store_dir is deprecated
 	 * $store_dir added directory 'file' to the defined path
+	 *
+	 * \Skeleton\File\Config::$file_dir is deprecated
+	 *
 	 * Please use $file_dir instead
 	 */
 

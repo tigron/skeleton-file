@@ -200,8 +200,12 @@ class File {
 	 * @return string $path
 	 */
 	public function get_path() {
-		if (Config::$store_dir === null && Config::$file_dir === null) {
-			throw new \Exception('Set a path first in "Config::$file_dir"');
+		if (Config::$file_dir !== null) {
+			Config::$file_path = Config::$file_dir;
+		} elseif (Config::$store_dir !== null) {
+			Config::$file_path = Config::$store_dir . '/file';
+		} else {
+			throw new \Exception('Set a path first in "Config::$file_path"');
 		}
 
 		if (isset($this->path) && !empty($this->path)) {
@@ -214,13 +218,7 @@ class File {
 			$this->save();
 		}
 
-		if (Config::$file_dir !== null) {
-			$path = Config::$file_dir . '/' . $local_path;
-		} else {
-			$path = Config::$store_dir . '/file/' . $local_path;
-		}
-
-		return $path;
+		return Config::$file_path . '/' . $local_path;
 	}
 
 	/**
@@ -342,10 +340,6 @@ class File {
 	 * @return File $file
 	 */
 	public static function merge($name, $files = []) {
-		if (Config::$store_dir === null && Config::$file_dir === null) {
-			throw new \Exception('Set a path first in "Config::$file_dir"');
-		}
-
 		$config = \Skeleton\Core\Config::Get();
 
 		// Sanitize name to use as a filename
@@ -429,10 +423,6 @@ class File {
 	 * @return File
 	 */
 	private static function create($action, $name, $content, $created = null) {
-		if (Config::$store_dir === null && Config::$file_dir === null) {
-			throw new \Exception('Set a path first in "Config::$file_dir"');
-		}
-
 		if (empty($created)) {
 			$created = time();
 		} else {

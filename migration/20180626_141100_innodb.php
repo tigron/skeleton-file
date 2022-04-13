@@ -25,7 +25,7 @@ class Migration_20180626_141100_Innodb extends \Skeleton\Database\Migration {
 		if (isset($result['engine']) and $result['engine'] == 'InnoDB') {
 			return;
 		}
-	
+
 		if (isset($result['Engine']) and $result['Engine'] == 'InnoDB') {
             		return;
         	}
