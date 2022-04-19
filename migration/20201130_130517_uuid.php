@@ -18,8 +18,14 @@ class Migration_20201130_130517_Uuid extends \Skeleton\Database\Migration {
 	public function up() {
 		$db = Database::get();
 
-		$db->query("ALTER TABLE `file` ADD COLUMN IF NOT EXISTS expiration_date datetime DEFAULT NULL AFTER size;");
-		$db->query("ALTER TABLE `file` ADD COLUMN IF NOT EXISTS uuid varchar(36) DEFAULT NULL	AFTER expiration_date;");
+		$database = $db->get_one('SELECT DATABASE()');
+		if ($db->get_one('SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE 1 AND TABLE_SCHEMA = "' . $database . '" AND TABLE_NAME="file" AND COLUMN_NAME = "expiration_date"') === null) {
+			$db->query("ALTER TABLE `file` ADD COLUMN expiration_date datetime DEFAULT NULL AFTER size;");
+		}
+
+		if ($db->get_one('SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE 1 AND TABLE_SCHEMA = "' . $database . '" AND TABLE_NAME="file" AND COLUMN_NAME = "uuid"') === null) {
+			$db->query("ALTER TABLE `file` ADD COLUMN uuid varchar(36) DEFAULT NULL	AFTER expiration_date;");
+		}
 	}
 
 	/**
