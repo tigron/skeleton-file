@@ -7,7 +7,7 @@
 		"ext-intl": "*",
 		"tigron/skeleton-database": "0.*",
 		"tigron/skeleton-object": "0.* || 1.*",
-		"tigron/skeleton-core": "2.*"
+		"tigron/skeleton-core": ">=2.0"
 	},
 	"license": "MIT",
 	"authors": [
