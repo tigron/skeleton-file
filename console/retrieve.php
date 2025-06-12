@@ -36,7 +36,7 @@ class File_Retrieve extends \Skeleton\Console\Command {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$id = $input->getArgument('id');
 		$dir = $input->getArgument('dir');
 

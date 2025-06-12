@@ -35,7 +35,7 @@ class File_Store extends \Skeleton\Console\Command {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$filename = $input->getArgument('filename');
 		if (file_exists($filename) == false) {
 			$output->writeln('<error>Please specify an existing filename</error>');

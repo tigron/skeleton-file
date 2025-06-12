@@ -35,7 +35,7 @@ class File_Cleanup extends \Skeleton\Console\Command {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$type = $input->getArgument('type');
 		$dryrun = $input->getArgument('mode');
 		if (strtoupper($dryrun) == 'DRYRUN' || strtoupper($dryrun) == 'DRY-RUN') {
