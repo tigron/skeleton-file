@@ -471,6 +471,22 @@ class File {
 		$file->save();
 
 		$file_classname = get_called_class();
-		return $file_classname::get_by_id($file->id);
+
+		// this is the first time the file will be available with it's resolved
+		// classname, so we can only call validate reliably from now on.
+		$file = $file_classname::get_by_id($file->id);
+
+		if (
+			method_exists($file, 'validate') &&
+			is_callable([$file, 'validate'])
+		) {
+			$errors = [];
+			if ($file->validate($errors) === false) {
+				$file->delete();
+				throw new \Skeleton\Object\Exception_Validation($errors);
+			}
+		}
+
+		return $file;
 	}
 }
