@@ -7,6 +7,15 @@
  * @author David Vandemaele <david@tigron.be>
  */
 
+	/**
+	 * trait get table field updated
+	 *
+	 * @access private
+	 */
+	private static function trait_get_table_field_updated() {
+		return null;
+	}
+
 namespace Skeleton\File;
 
 class File {
@@ -488,5 +497,14 @@ class File {
 		}
 
 		return $file;
+	}
+
+	/**
+	 * trait get table field updated
+	 *
+	 * @access private
+	 */
+	private static function trait_get_table_field_updated() {
+		return null;
 	}
 }
